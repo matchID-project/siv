@@ -1,0 +1,6 @@
+datasets:
+  dcd_x_siv_match_bis:
+    connector: upload
+    table: dcd_x_siv_match_bis.hdf
+    type: hdf
+    chunk: 10000

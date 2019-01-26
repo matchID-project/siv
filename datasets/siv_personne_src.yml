@@ -1,0 +1,8 @@
+datasets:
+  siv_personne_src:
+    connector: upload
+    chunk: 10000
+    table: esiv_personne_siv.csv.gz
+    type: csv
+    sep: "\t"
+    encoding: "utf8"

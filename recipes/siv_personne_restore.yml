@@ -1,0 +1,16 @@
+recipes:
+  siv_personne_restore:
+    supervisor_interval: 10
+    write_queue_length: 1
+    threads: 1
+    input: 
+      dataset: siv_personne_backup
+      chunk: 10100
+ 
+    output: 
+      dataset: siv_personne
+      timeout: 45
+      # chunk: 2000
+      thread_count: 16
+      max_tries: 3
+    steps:

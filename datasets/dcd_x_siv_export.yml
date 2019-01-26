@@ -1,0 +1,7 @@
+datasets:
+  dcd_x_siv_export:
+    connector: upload
+    table: 201901_matchid_dcd_x_siv_export.csv
+    type: csv
+    sep: ";"
+    encoding: "utf8"

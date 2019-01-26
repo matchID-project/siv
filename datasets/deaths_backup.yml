@@ -1,0 +1,6 @@
+datasets:
+  deaths_backup:
+    connector: upload
+    table: deaths_backup.msgpack
+    type: msgpack
+    chunk: 10000

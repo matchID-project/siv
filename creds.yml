@@ -1,0 +1,4 @@
+groups:
+  siv_pers:
+    projects:
+      siv_pers: {admin: admin}

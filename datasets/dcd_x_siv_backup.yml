@@ -1,0 +1,5 @@
+datasets:
+  dcd_x_siv_backup:
+    connector: upload
+    table: dcd_x_siv_backup.msgpack
+    type: msgpack

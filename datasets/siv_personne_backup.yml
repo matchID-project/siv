@@ -1,0 +1,6 @@
+datasets:
+  siv_personne_backup:
+    connector: upload
+    table: siv_personne_backup.msgpack
+    type: msgpack
+    chunk: 10000

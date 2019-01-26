@@ -1,0 +1,16 @@
+recipes:
+  dcd_siv_scoring:
+    threads: 120
+    test_chunk_size: 1000
+    input: 
+      # dataset: deaths_fwf
+      dataset: dcd_x_siv_match
+      chunk: 2000
+    output: dcd_x_siv_backup
+    steps:
+      # - dataprep_deaths:
+      # - siv_pers_matching:
+      - siv_personne_scoring:
+      # - siv_personne_ml_rescore:
+
+

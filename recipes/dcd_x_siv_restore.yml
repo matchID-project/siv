@@ -1,0 +1,17 @@
+recipes:
+  dcd_x_siv_restore:
+    supervisor_interval: 10
+    write_queue_length: 10
+    test_chunk_size: 500
+    threads: 24
+    input: 
+      dataset: dcd_x_siv_backup
+      chunk: 500
+    output: 
+      dataset: siv_x_deaths
+      timeout: 45
+    #  chunk: 2000
+      thread_count: 12
+      max_tries: 2
+    steps:
+      - siv_personne_ml_rescore:

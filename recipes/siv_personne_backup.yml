@@ -1,0 +1,23 @@
+recipes:
+  siv_personne_backup:
+    supervisor_interval: 10
+    write_queue_length: 25
+    threads: 20
+    input: 
+      dataset: siv_personne
+      chunk: 2000
+      thread_count: 20
+      select:
+        query:
+          constant_score: 
+            filter:
+              exists:
+                field:
+                  matchid_id      
+    output: 
+      dataset: siv_personne_backup
+    #  timeout: 30
+    #  chunk: 2000
+      thread_count: 1
+    #  max_tries: 3
+    steps:

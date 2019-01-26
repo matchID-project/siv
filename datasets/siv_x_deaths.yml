@@ -1,0 +1,104 @@
+datasets:
+  siv_x_deaths:
+    connector: elasticsearch
+    table: siv_x_deaths
+    body:
+      settings:
+        index:
+          refresh_interval: 30s
+          number_of_shards: 16
+          number_of_replicas: 0
+    validation: 
+      elasticsearch:
+        connection:
+          host: es_proxy_path
+        index: dataset
+        type: dataset
+        size: 599    
+      columns:
+        - field: matchid_id
+          label: Hashed Id
+          display: false
+          searchable: true
+        - field:
+            - matchid_name_last_src
+            - hit_matchid_name_last_src
+          label: last name
+          display: true
+          searchable: true
+          callBack: formatDiff
+        - field:
+            - matchid_name_first_src
+            - hit_matchid_name_first_src
+          label: first name
+          display: true
+          searchable: true
+          callBack: formatDiff
+        - field:
+            - matchid_sex
+            - hit_matchid_sex
+          label: sex
+          display: true
+          searchable: true
+          callBack: formatSex
+          appliedClass:
+            head: head-centered
+            body: has-text-centered
+        - field:
+            - matchid_date_birth_str
+            - hit_matchid_date_birth_str
+          label: birth date
+          display: true
+          searchable: true
+          callBack: formatDate
+          appliedClass:
+            head: head-centered
+            body: has-text-centered
+        - field:
+            - matchid_location_city
+            - hit_matchid_location_city
+          label: birth city
+          display: true
+          searchable: true
+          callBack: coloredDiff
+        - field:
+            - matchid_location_depcode
+            - hit_matchid_location_depcode
+          label: birth dep
+          display: true
+          searchable: true
+          callBack: coloredDiff
+        - field:
+            - matchid_location_country
+            - hit_matchid_location_country
+          label: birth country
+          display: true
+          searchable: true
+          callBack: coloredDiff          
+        - field: matchid_hit_distance
+          label: Distance
+          display: true
+          searchable: false
+          callBack: formatDistance
+          appliedClass:
+            head: head-centered
+            body: has-text-centered
+        - field: confiance
+          label: Score
+          display: true
+          searchable: false
+          type: score
+          callBack: formatNumber
+          appliedClass:
+            head: head-centered
+            body: has-text-centered min-column-width-100
+        - field: matchid_hit_score
+          label: Pre_Score
+          display: true
+          searchable: false
+          type: score
+          callBack: formatNumber
+          appliedClass:
+            head: head-centered
+            body: has-text-centered min-column-width-100
+  

@@ -1,0 +1,66 @@
+recipes:
+  dataprep_siv_pers:
+####################################
+#  dataprepartion steps for SIV   #
+####################################
+    test_chunk_size: 200
+    threads: 120
+    supervisor_interval: 30    
+    input: 
+      dataset: siv_personne_src
+      select: #keep only useful cols
+        - PERS_ID
+        - PERS_SEXE
+        - PERS_NOM_NAISSANCE
+        - PERS_NOM_USAGE
+        - PERS_PRENOM
+        - PERS_DATE_NAISSANCE
+        - PERS_COMMUNE
+        - PERS_DEP_NAISSANCE
+        - PERS_PAYS
+    output:
+      dataset: siv_personne_backup
+      thread_count: 30    
+    steps:
+      - replace: #remove trailing blank spaces which is a format bug
+          select: .*
+          regex:
+            - \s*$: ''     
+      - eval: #tag the dataset
+          # matchid_id: sha1(row)
+          - matchid_src: str("SIV")
+          - matchid_tag: "20181218"   
+      - map:
+          #mappings id, nsame, sex, date and location
+          matchid_id: PERS_ID
+          matchid_name_last_src:
+            - PERS_NOM_NAISSANCE
+            - PERS_NOM_USAGE
+          matchid_name_first_src: PERS_PRENOM
+          matchid_sex_src: PERS_SEXE
+          matchid_date_birth_src: PERS_DATE_NAISSANCE
+          matchid_location_city_src: PERS_COMMUNE
+          matchid_location_depcode_src: PERS_DEP_NAISSANCE
+          matchid_location_depcode: PERS_DEP_NAISSANCE
+          matchid_location_country_src: PERS_PAYS
+      - keep:
+          select: matchid_.*
+      - eval:
+        - matchid_sex: 2 if matchid_sex_src == 'F' else 1
+        - matchid_location_country: matchid_location_country_src if (matchid_location_country_src != "") else str('FRANCE')
+      - replace:
+          select: matchid_location_depcode$
+          regex:
+            - ^0(\d\d): '\1'
+      - french_name_normalize:
+   #   - eval:
+   #       - matchid_name_first_first: re.sub(r'(\S\s+\S+)\s+.*',r'\1',str(matchid_name_first[0])) if (len(matchid_name_first)>0) else ""
+      - french_name_frequency: 
+      - replace:
+          select: matchid_date_birth_src
+          regex:
+            - '\-': ''
+            - 'T.*' : ''
+      - ymd_date:
+      - country_label:
+      - french_city+dep:    

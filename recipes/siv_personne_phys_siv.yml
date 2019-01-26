@@ -1,0 +1,23 @@
+recipes:
+  siv_personne_phys_siv:
+    input: 
+      dataset: siv_personne_src
+      select: #keep only useful cols
+        - PERS_ID
+        - PERS_SEXE
+        - PERS_NOM_NAISSANCE
+        - PERS_NOM_USAGE
+        - PERS_PRENOM
+        - PERS_DATE_NAISSANCE
+        - PERS_COMMUNE
+        - PERS_DEP_NAISSANCE
+        - PERS_PAYS
+      filter:
+        siv_personne_phys_siv
+    output:
+      dataset: siv_personne
+      thread_count: 1    
+    steps:
+      - keep:
+          select: .*
+          where: PERS_PRENOM != ""

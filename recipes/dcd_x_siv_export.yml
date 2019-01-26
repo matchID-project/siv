@@ -1,0 +1,26 @@
+recipes:
+  dcd_x_siv_export:
+    supervisor_interval: 10
+    write_queue_length: 10
+    test_chunk_size: 500
+    threads: 120
+    input: 
+      dataset: dcd_x_siv_backup
+      chunk: 100
+    output: 
+      dataset: dcd_x_siv_export
+    steps:
+      - siv_personne_ml_rescore:
+      - keep:
+          select: matchid_date_death_src|confiance|hit_matchid_id
+          where : confiance >= 70
+      - replace:
+          select: matchid_date_death_src
+          regex:
+            - '(....)(..)(..)': '\3/\2/\1'
+      - rename:
+          PERS_ID: hit_matchid_id
+          PERS_DATE_DECES: matchid_date_death_src
+          PERS_TAUX: confiance
+      - eval:
+          - PERS_TAUX: int(PERS_TAUX)

@@ -1,0 +1,27 @@
+datasets:
+  siv_personne:
+    connector: elasticsearch
+    table: siv_personne
+    body:
+      settings:
+        index:
+          refresh_interval: 30s
+          number_of_shards: 64
+          number_of_replicas: 0
+      mappings:
+        siv_personne:
+          _all:
+            enabled: False
+          dynamic: False
+          properties:
+            matchid_id:
+              type: keyword
+            matchid_name_match:
+              type: text
+            matchid_date_birth_str:
+              type: keyword
+            matchid_location_city:
+              type: keyword
+            matchid_location_country:
+              type: keyword
+          

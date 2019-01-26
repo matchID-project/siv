@@ -1,0 +1,7 @@
+recipes:
+  death_fail:
+    input: replace_input
+    output: replace_output
+    steps:
+      - eval:
+          - new_col: sha1(row)

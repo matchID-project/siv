@@ -1,0 +1,46 @@
+recipes:
+  siv_personne_ml_rescore:
+    test_chunk_size: 1000
+    input: 
+      dataset: dcd_x_siv_backup
+      chunk: 1000
+      #select:
+      #  query:
+      #    constant_score: 
+      #      filter:
+      #        exists:
+      #          field:
+      #            hit_matchid_id
+
+      # select:
+      #   query:
+      #     term:
+      #       hit_matchid_id: 10378000226
+    output: 
+      dataset: siv_x_deaths
+      mode: update
+    steps:
+      - eval:
+          - matchid_hit_score_location_lv_city_src: matchid_hit_score_location_lv_city if type(matchid_hit_score_location_lv_city) == type(0.5) else 0.5 
+          - matchid_hit_score_location_lv_city_src: matchid_hit_score_location_lv_city_src if type(matchid_hit_score_location_lv_city_src) == type(0.5) else 0.5 
+          - matchid_hit_score_location: matchid_hit_score_location if type(matchid_hit_score_location) == type(0.5) else 0.5    
+          - matchid_hit_score: matchid_hit_score if type(matchid_hit_score) == type(0.5) else 0.5    
+      - apply_model:
+          name: siv_x_deaths_ml
+          # 1st model
+          # numerical: ['hit_matchid_location_city_population', 'hit_matchid_location_city_surface', 'hit_score', 'matchid_hit_distance', 'matchid_hit_score', 'matchid_hit_score_date', 'matchid_hit_score_location', 'matchid_hit_score_location_citycode', 'matchid_hit_score_location_citycode_history', 'matchid_hit_score_location_countrycode', 'matchid_hit_score_location_depcode', 'matchid_hit_score_location_distance','matchid_hit_score_location_lv_city','matchid_hit_score_location_lv_city_src','matchid_hit_score_location_lv_country','matchid_hit_score_name','matchid_hit_score_name_lv_nn','matchid_hit_score_name_lv_np','matchid_hit_score_name_lv_pp', 'matchid_hit_score_name_tokens', 'matchid_hit_score_sex', 'matchid_location_city_population', 'matchid_location_city_surface'] 
+          # 2nd model
+          # numerical: .*(hit_score_(?!ml).*|hit_score$|number$|len$|freq$|population|surface|matchid_hit_distance)$
+          numerical: ['hit_matchid_hit_number','hit_matchid_location_city_population','hit_matchid_location_city_surface','hit_matchid_name_first_first_len','hit_matchid_name_first_freq','hit_matchid_name_first_len','hit_matchid_name_first_second_freq','hit_matchid_name_last_freq','hit_matchid_name_last_second_freq','hit_matchid_name_len','hit_score','matchid_hit_distance','matchid_hit_freq','matchid_hit_score','matchid_hit_score_date','matchid_hit_score_location','matchid_hit_score_location_citycode','matchid_hit_score_location_citycode_history','matchid_hit_score_location_countrycode','matchid_hit_score_location_depcode','matchid_hit_score_location_distance','matchid_hit_score_location_lv_city','matchid_hit_score_location_lv_city_src','matchid_hit_score_location_lv_country','matchid_hit_score_name','matchid_hit_score_name_lv_nn','matchid_hit_score_name_lv_np','matchid_hit_score_name_lv_pp','matchid_hit_score_name_tokens','matchid_hit_score_sex','matchid_location_city_population','matchid_location_city_surface','matchid_name_first_first_len','matchid_name_first_freq','matchid_name_first_len','matchid_name_first_second_freq','matchid_name_last_freq','matchid_name_last_second_freq','matchid_name_len']
+          target: matchid_hit_score_ml
+      - eval:
+          - confiance: >
+              try:
+                cell = round(100 if matchid_hit_score == 1 else 0.7*float(matchid_hit_score_ml)+30*float(matchid_hit_score))
+              except:
+                try:
+                  cell = matchid_hit_score_ml
+                except:
+                  cell = matchid_hit_score
+          - scoring_version: str("{}-randomforest-{}").format(re.sub("-.*","",scoring_version),str(datetime.datetime.now()))
+    

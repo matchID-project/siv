@@ -1,0 +1,6 @@
+datasets:
+  dcd_x_siv_match:
+    connector: upload
+    table: dcd_x_siv_match.msgpack
+    type: msgpack
+    chunk: 10000
