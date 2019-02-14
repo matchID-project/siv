@@ -2,18 +2,23 @@ recipes:
   dcd_x_siv_export:
     supervisor_interval: 10
     write_queue_length: 10
-    test_chunk_size: 500
+    test_chunk_size: 10000
     threads: 120
     input: 
       dataset: dcd_x_siv_backup
-      chunk: 100
+      chunk: 20000
     output: 
       dataset: dcd_x_siv_export
+      thread_count: 1
+    threads: 20
     steps:
-      - siv_personne_ml_rescore:
-      - keep:
-          select: matchid_date_death_src|confiance|hit_matchid_id
-          where : confiance >= 70
+      #- siv_personne_ml_rescore:
+      - exec:
+          - df=df[df.matchid_hit_score_date > 0.9]
+          - df=df[pd.to_numeric(df['confiance'], errors='coerce').notnull()]
+          - df = df[df['confiance']>=70]
+          - df['confiance']=df['confiance'].astype('int')
+          - df = df[['matchid_date_death_src','confiance','hit_matchid_id']]
       - replace:
           select: matchid_date_death_src
           regex:
@@ -22,5 +27,3 @@ recipes:
           PERS_ID: hit_matchid_id
           PERS_DATE_DECES: matchid_date_death_src
           PERS_TAUX: confiance
-      - eval:
-          - PERS_TAUX: int(PERS_TAUX)

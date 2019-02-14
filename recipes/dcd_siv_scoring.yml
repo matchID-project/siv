@@ -1,15 +1,18 @@
 recipes:
   dcd_siv_scoring:
     threads: 120
-    test_chunk_size: 1000
+    test_chunk_size: 100
     input: 
-      # dataset: deaths_fwf
-      dataset: dcd_x_siv_match
+      dataset: deaths_fwf
+      #dataset: dcd_x_siv_match
       chunk: 2000
     output: dcd_x_siv_backup
     steps:
-      # - dataprep_deaths:
-      # - siv_pers_matching:
+      - dataprep_deaths:
+      - siv_pers_matching:
+      - exec:
+          - df['hit_matchid_name_first_freq'] = 1
+          - df['hit_matchid_name_last_freq'] = 1
       - siv_personne_scoring:
       # - siv_personne_ml_rescore:
 

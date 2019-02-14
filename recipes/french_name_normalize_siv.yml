@@ -1,0 +1,13 @@
+recipes:
+  french_name_normalize_siv:
+    input: replace_input
+    output: replace_output
+    steps:
+      - normalize:
+          select: matchid_name_(last|first)$
+      - eval:
+        - matchid_name_match: str(" ").join(list(list(set().union(list(OrderedDict.fromkeys(matchid_name_last_src)),[matchid_name_first_src]))))
+      - replace:
+          select: matchid_name_.*match$
+          regex:
+            - (^|\s)(le|du|de|de la|da|del|los|l)($|\s): '\1\2'

@@ -3,12 +3,12 @@ recipes:
     threads: 32
     test_chunk_size: 100
     input: 
-      dataset: dcd_x_siv_backup
+      dataset: deaths_fwf
       #dataset: death_fail
-    output: dcd_x_siv_backup
+    output: siv_x_deaths
     steps:
-      #- dataprep_deaths:
-      #- siv_pers_matching:
+      - dataprep_deaths:
+      - siv_pers_matching:
       - siv_personne_scoring:
       #- siv_personne_ml_rescore:
 

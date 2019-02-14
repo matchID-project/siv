@@ -6,12 +6,15 @@ recipes:
     threads: 24
     input: 
       dataset: dcd_x_siv_backup
-      chunk: 500
+      chunk: 5000
     output: 
       dataset: siv_x_deaths
       timeout: 45
     #  chunk: 2000
-      thread_count: 12
+      thread_count: 8
       max_tries: 2
     steps:
-      - siv_personne_ml_rescore:
+      - exec:
+          - df = df[df['confiance']>=70]
+    
+      # - siv_personne_ml_rescore:

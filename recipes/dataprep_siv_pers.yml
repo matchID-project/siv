@@ -4,7 +4,7 @@ recipes:
 #  dataprepartion steps for SIV   #
 ####################################
     test_chunk_size: 200
-    threads: 120
+    threads: 64
     supervisor_interval: 30    
     input: 
       dataset: siv_personne_src
@@ -20,7 +20,7 @@ recipes:
         - PERS_PAYS
     output:
       dataset: siv_personne_backup
-      thread_count: 30    
+    threads: 8      
     steps:
       - replace: #remove trailing blank spaces which is a format bug
           select: .*

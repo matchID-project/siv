@@ -1,0 +1,61 @@
+recipes:
+  scoring_location_siv:
+    input: dcd_x_siv_match
+    output: replace_output
+    steps:
+      # scoring lieu
+      - exec: 
+          - df['matchid_hit_score_location_citycode'] = np.where(df['matchid_location_citycode'] == df['hit_matchid_location_citycode'], 1, 0)
+          - df['matchid_hit_score_location_city'] = np.where(df['matchid_location_city'] == df['hit_matchid_location_city'], 1, 0)
+      - exec: >
+          df['matchid_hit_score_location_city_lv'] = np.where(
+            df['matchid_hit_score_location_city'] == 1,
+            1,
+            df.apply(lambda row:
+                          levenshtein_norm(row['matchid_location_city'],row['hit_matchid_location_city']),
+                      axis = 1)
+            )
+      - exec: >
+          df['matchid_hit_score_location_country_lv'] = np.where(
+            df['matchid_location_country'] == df['hit_matchid_location_country'],
+            1,
+            df.apply(lambda row:
+                          levenshtein_norm(row['matchid_location_country'],row['hit_matchid_location_country']),
+                      axis = 1)
+            )
+      - exec: >
+          df['matchid_hit_distance'] = np.where(
+            df['matchid_hit_score_location_city'] == 1,
+            0,
+            df.apply(lambda row:
+                     distance(row.matchid_location_city_geopoint_2d,row.hit_matchid_location_city_geopoint_2d) if ((row.matchid_location_city_geopoint_2d != "") & (row.hit_matchid_location_city_geopoint_2d != "")) else 90000,
+                     axis = 1)
+            )
+      - exec: >
+          df['matchid_hit_score_location_distance'] = np.where(
+            df.matchid_hit_distance == 9000,
+            0,
+            ((100*40/(40+df.matchid_hit_distance.astype(float)))/100).round(2)
+            )
+      - exec:
+          df['matchid_hit_score_location_depcode'] = np.where(df['matchid_location_depcode'] == df['hit_matchid_location_depcode'],1,0)
+      - exec: >
+          df['matchid_hit_score_location_history'] = np.where(
+            df['matchid_hit_score_location_citycode'] == 1,
+            1,
+            df.apply(lambda row:
+                     (row.matchid_location_citycode in row.hit_matchid_location_citycode_history) | (row.hit_matchid_location_citycode in row.matchid_location_citycode_history),
+                     axis = 1)
+            )
+      
+      - exec: >
+          df['matchid_hit_score_location'] = np.where(
+            (df['matchid_hit_score_location_citycode'] == 1) |
+            (df['matchid_hit_score_location_history'] == 1),
+            1,
+            np.where(df.matchid_location_country == "FRANCE",
+              0.9 * np.where(df.matchid_hit_score_location_distance > df.matchid_hit_score_location_city_lv,
+                             df.matchid_hit_score_location_distance,
+                             0.8 * df.matchid_hit_score_location_city_lv + 0.2 * df.matchid_hit_score_location_depcode),
+              df.matchid_hit_score_location_country_lv)
+            ).round(2)

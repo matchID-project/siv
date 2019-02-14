@@ -16,8 +16,8 @@ datasets:
         type: dataset
         size: 599    
       columns:
-        - field: matchid_id
-          label: Hashed Id
+        - field: hit_matchid_id
+          label: pers_id
           display: false
           searchable: true
         - field:

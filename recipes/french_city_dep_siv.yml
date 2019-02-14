@@ -1,0 +1,40 @@
+recipes:
+  french_city_dep_siv:
+    input: replace_input
+    output: replace_output
+    steps:
+      - map:
+          matchid_location_city_norm: matchid_location_city_src
+      - normalize: 
+          select: matchid_location_city_norm
+      - french_city_norm:
+      - join:
+          type : in_memory
+          dataset: french_city2dep_fuzzy
+          strict:
+            matchid_location_city_norm: norm_name
+            matchid_location_countrycode: CODEISO3            
+          select: 
+            matchid_location_depcode_ref: dep_code
+      - eval:
+          - matchid_location_depcode: matchid_location_depcode_ref if (matchid_location_depcode_ref != "") else matchid_location_depcode
+      - join:
+          type : in_memory
+          dataset: french_citycodes_fuzzy
+          fuzzy:
+            matchid_location_city_norm: norm_name
+          strict: 
+            # matchid_location_city_norm: norm_name
+            matchid_location_depcode: dep_code
+            matchid_location_countrycode: CODEISO3
+          select: 
+            matchid_location_citycode: insee_code
+            matchid_location_citycode_history: insee_code_history
+            matchid_location_city: name
+            matchid_location_city_alter: newest_name
+            matchid_location_depcode_alter: newest_dep_code
+            matchid_location_city_population: population
+            matchid_location_city_surface: surface
+            matchid_location_city_geopoint_2d: geopoint_2d
+      - delete:
+          select: matchid_location_city_norm.*|matchid_location_depcode_ref
