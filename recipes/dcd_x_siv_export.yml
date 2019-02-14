@@ -16,10 +16,15 @@ recipes:
       - exec:
           - df=df[df.matchid_hit_score_date > 0.9]
           - df=df[df.matchid_hit_score_name_lv_pp > 0.8]
+          - df=df[(df.hit_matchid_name_last_freq > 0) & (df.matchid_hit_score_location_distance < 1)]
           - df=df[pd.to_numeric(df['confiance'], errors='coerce').notnull()]
           - df = df[df['confiance']>=70]
-          - df['confiance']=df['confiance'].astype('int')
+          - df['confiance']=df['confiance'].astype('str')
           - df = df[['matchid_date_death_src','confiance','hit_matchid_id']]
+      - replace:
+          select: confiance
+          regex:
+            - '\..*$': ''
       - replace:
           select: matchid_date_death_src
           regex:
