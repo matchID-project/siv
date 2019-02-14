@@ -15,6 +15,7 @@ recipes:
       #- siv_personne_ml_rescore:
       - exec:
           - df=df[df.matchid_hit_score_date > 0.9]
+          - df=df[df.matchid_hit_score_name_lv_pp > 0.8]
           - df=df[pd.to_numeric(df['confiance'], errors='coerce').notnull()]
           - df = df[df['confiance']>=70]
           - df['confiance']=df['confiance'].astype('int')
