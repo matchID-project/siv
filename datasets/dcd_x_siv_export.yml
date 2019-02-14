@@ -6,8 +6,4 @@ datasets:
     sep: ","
     quoting: QUOTE_NONE
     encoding: "utf8"
-    names:
-      - PERS_ID
-      - PERS_DATE_DECES
-      - PERS_TAUX
       

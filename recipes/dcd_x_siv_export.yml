@@ -2,7 +2,7 @@ recipes:
   dcd_x_siv_export:
     supervisor_interval: 10
     write_queue_length: 10
-    test_chunk_size: 10000
+    test_chunk_size: 100
     threads: 120
     input: 
       dataset: dcd_x_siv_backup
@@ -15,12 +15,16 @@ recipes:
       #- siv_personne_ml_rescore:
       - exec:
           - df=df[df.matchid_hit_score_date > 0.9]
+          - df=df[(df.matchid_date_death_src > "20090000") | (df.matchid_hit_score ==1)]
           - df=df[df.matchid_hit_score_name_lv_pp > 0.8]
-          - df=df[(df.hit_matchid_name_last_freq > 0) & (df.matchid_hit_score_location_distance < 1)]
+          - df=df[(df.hit_matchid_name_last_freq == 0) | (df.matchid_hit_score_location_distance == 1)]
+          - df=df[(df.matchid_hit_score_location == 1) | (df.matchid_hit_score_name == 1)]
           - df=df[pd.to_numeric(df['confiance'], errors='coerce').notnull()]
           - df = df[df['confiance']>=70]
           - df['confiance']=df['confiance'].astype('str')
           - df = df[['matchid_date_death_src','confiance','hit_matchid_id']]
+      - keep:
+          select: matchid_date_death_src|confiance|hit_matchid_id|matchid_id|.*score_[a-z]+$|.*diff_(?!id).*
       - replace:
           select: confiance
           regex:
