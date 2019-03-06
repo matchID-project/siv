@@ -6,11 +6,10 @@ recipes:
     threads: 120
     input: 
       dataset: dcd_x_siv_backup
-      chunk: 20000
     output: 
       dataset: dcd_x_siv_export
       thread_count: 1
-    threads: 20
+    threads: 1
     steps:
       #- siv_personne_ml_rescore:
       - exec:
@@ -21,8 +20,10 @@ recipes:
           - df=df[(df.matchid_hit_score_location == 1) | (df.matchid_hit_score_name == 1)]
           - df=df[pd.to_numeric(df['confiance'], errors='coerce').notnull()]
           - df = df[df['confiance']>=70]
-          - df['confiance']=df['confiance'].astype('str')
+          - df['confiance'] = np.where(df['confiance'] > 100, 100, df['confiance'])
+          - df['confiance'] = df['confiance'].astype('str')
           - df = df[['matchid_date_death_src','confiance','hit_matchid_id']]
+          - df.drop_duplicates(subset=['matchid_date_death_src'], inplace = True)
       - keep:
           select: matchid_date_death_src|confiance|hit_matchid_id|matchid_id|.*score_[a-z]+$|.*diff_(?!id).*
       - replace:
