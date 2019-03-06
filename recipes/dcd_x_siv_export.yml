@@ -6,8 +6,11 @@ recipes:
     threads: 120
     input: 
       dataset: dcd_x_siv_backup
+      # obligatoire pour dédupliquer (plusieurs décédés peuvent matcher un 
+      chunked: false
     output: 
       dataset: dcd_x_siv_export
+      chunk: 400000
       thread_count: 1
     threads: 1
     steps:
@@ -21,9 +24,10 @@ recipes:
           - df=df[pd.to_numeric(df['confiance'], errors='coerce').notnull()]
           - df = df[df['confiance']>=70]
           - df['confiance'] = np.where(df['confiance'] > 100, 100, df['confiance'])
+          - df.sort_values(['confiance', 'matchid_date_death_src'], ascending=False, inplace=True)
+          - df.drop_duplicates(subset=['hit_matchid_id'], inplace = True)
           - df['confiance'] = df['confiance'].astype('str')
           - df = df[['matchid_date_death_src','confiance','hit_matchid_id']]
-          - df.drop_duplicates(subset=['matchid_date_death_src'], inplace = True)
       - keep:
           select: matchid_date_death_src|confiance|hit_matchid_id|matchid_id|.*score_[a-z]+$|.*diff_(?!id).*
       - replace:
